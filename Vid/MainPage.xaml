@@ -5,7 +5,7 @@
     xmlns:local="using:Vid"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" >
+    mc:Ignorable="d" Width="906.836" >
     <Page.Resources>
         <Style x:Key="ButtonStyle1" TargetType="Button">
             <Setter Property="Background" Value="{ThemeResource ButtonBackground}"/>
@@ -91,8 +91,10 @@
         <StackPanel x:Name="vidList" Margin="0,40,0,0" HorizontalAlignment="Left" Height="auto" Width="150"/>
         <Grid Margin="150,0,0,0" Background="#99000000">
             <Button x:Name="button" Content="choose file" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="40" Width="120" Click="Button_Click" Margin="0,0,32,32" Background="#FFFDB144" Canvas.ZIndex="1" Style="{StaticResource ButtonStyle1}" />
-            <MediaPlayerElement x:Name="player" Margin="0,0,0,150" Width="auto" Height="auto" PosterSource="Assets/poster.PNG" FocusVisualPrimaryBrush="White" AreTransportControlsEnabled="True"/>
+            <MediaPlayerElement x:Name="player" Margin="0,0,0,150" Width="auto" Height="auto" PosterSource="Assets/poster.PNG" FocusVisualPrimaryBrush="White" AreTransportControlsEnabled="True" Tapped="player_tab"/>
             <StackPanel Margin="0,0,0,0" Width="auto" Height="150" VerticalAlignment="Bottom" Orientation="Horizontal" Background="#FF616161">
+                <TextBlock x:Name="tb_answer" TextWrapping="Wrap" Text="TextBlock" Margin="0,10" Width="488" RenderTransformOrigin="0.492,0.508"/>
+                <Button Content="Check!" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="answer_check"/>
 
             </StackPanel>
 

@@ -10,7 +10,9 @@ using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media;
 using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Composition;
@@ -33,6 +35,8 @@ namespace Vid
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        
+
         public class AppFile
         {
             public string name { get; set; }
@@ -76,6 +80,7 @@ namespace Vid
                     label.Text = ms.Uri.ToString();
                 }
             }
+            
             public void OnClick(object sender, RoutedEventArgs e)
             {
                 //me.Source = MediaSource.CreateFromUri(new Uri(item.path));
@@ -85,7 +90,7 @@ namespace Vid
         }
         List<MediaSource> msL;
         List<AppFile> filelist;
-
+        private SystemMediaTransportControls MediaControls { get; }
         private void applyAcrylicAccent(Panel panel)
         {
             _compositor = ElementCompositionPreview.GetElementVisual(this).Compositor;
@@ -107,8 +112,43 @@ namespace Vid
             filelist = new List<AppFile>();
             msL = new List<MediaSource>();
             applyAcrylicAccent(MainGrid);
+
+            //This is catch event for MediaPlayer
+
+            MediaPlayer tmp = new MediaPlayer();
+            player.SetMediaPlayer(tmp); //set mediaplayer. before having null.
+
+            MediaControls = SystemMediaTransportControls.GetForCurrentView(); //easy for setting.
+            MediaControls.IsNextEnabled = true;
+            MediaControls.IsPreviousEnabled = true;
+
+            tmp.SystemMediaTransportControls.ButtonPressed += MediaControls_ButtonPressed; //callback function add
+
         }
-        
+
+        private async void MediaControls_ButtonPressed(
+                                SystemMediaTransportControls sender,
+                                SystemMediaTransportControlsButtonPressedEventArgs args)
+        {
+            switch (args.Button)
+            {
+                case SystemMediaTransportControlsButton.Play:
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        tb_answer.Text = "PLAY";
+                    });
+                    break;
+                case SystemMediaTransportControlsButton.Pause:
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        tb_answer.Text = "PAUSE";
+                    });
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (_hostSprite != null)
@@ -127,18 +167,18 @@ namespace Vid
 
             var file = await openPicker.PickSingleFileAsync();
 
-            if(file!= null)
+            if (file != null)
             {
 
                 AppFile ap = new AppFile();
-                ap.name = file.Name;
-                ap.path = file.Path;
+
                 MediaSource msi = MediaSource.CreateFromStorageFile(file);
                 msL.Add(msi);
                 //player.Source = msi;
                 //player.MediaPlayer.Play();
             }
-        } 
+        }
+        
 
         private async void Grid_DropAsync(object sender, DragEventArgs e)
         {
@@ -187,6 +227,24 @@ namespace Vid
                 e.DragUIOverride.Caption = "Add file";
                 e.DragUIOverride.IsContentVisible = true;
             }
+        }
+        
+        private async void answer_check(object sender, RoutedEventArgs e)
+        {
+            
+
+            /*
+            int i = 10;
+            while (0 < i--)
+            {
+                tb_answer.Text = "THIS PROGRAM IS PRINT THIS WORD EVERY 5 SEC, left " + i;
+                await Task.Delay(5000);
+            }
+            */
+        }
+
+        private void player_tab(object sender, TappedRoutedEventArgs e)
+        {
         }
     }
 }
