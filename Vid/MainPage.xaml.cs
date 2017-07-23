@@ -10,7 +10,9 @@ using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media;
 using Windows.Media.Core;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Composition;
@@ -33,6 +35,7 @@ namespace Vid
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private SystemMediaTransportControls MediaControls { get; }
         public class AppFile
         {
             public string name { get; set; }
@@ -46,7 +49,6 @@ namespace Vid
             AppFile item;
             public ListButton()
             {
-                
                 this.Width = 150;
                 this.Height = 40;
                 this.Margin = new Thickness(0, 0, 0, 8);
@@ -107,8 +109,29 @@ namespace Vid
             filelist = new List<AppFile>();
             msL = new List<MediaSource>();
             applyAcrylicAccent(MainGrid);
+            MediaPlayer mp = new MediaPlayer();
+            mp.CurrentStateChanged += Mp_CurrentStateChangedAsync;
+            player.SetMediaPlayer(mp);
         }
-        
+
+        private async void Mp_CurrentStateChangedAsync(MediaPlayer sender, object args)
+        {
+            switch (sender.PlaybackSession.PlaybackState)
+            {
+                case MediaPlaybackState.Playing:
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        button.Content = " playing";
+                    });
+                    break;
+                case MediaPlaybackState.Paused:
+                    await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+                    {
+                        button.Content = " paused";
+                    });
+                    break;
+            }
+        }
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (_hostSprite != null)
