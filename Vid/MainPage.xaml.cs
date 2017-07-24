@@ -39,7 +39,7 @@ namespace Vid
         public class AppFile
         {
             public string name { get; set; }
-            public string path { get; set; }
+            public MediaSource mediaSource { get; set; }
         }
         public class ListButton : Button
         {
@@ -59,33 +59,18 @@ namespace Vid
                 this.Content = label;
                 label.Tapped += OnClick;
             }
-            public ListButton(AppFile ap, MediaPlayerElement mpe) : this()
-            {
-                
-                this.item = ap;
-                label.Text = ap.path;
-            }
-            public ListButton(MediaSource ms, MediaPlayerElement mpe) : this()
+            public ListButton(AppFile ms, MediaPlayerElement mpe) : this()
             {
                 this.me = mpe;
-                this.ms = ms;
-                if (ms.Uri == null)
-                {
-                    label.Text = "x";
-                }
-                else { 
-                    
-                    label.Text = ms.Uri.ToString();
-                }
+                this.ms = ms.mediaSource;
+                label.Text = ms.name;
             }
             public void OnClick(object sender, RoutedEventArgs e)
             {
-                //me.Source = MediaSource.CreateFromUri(new Uri(item.path));
                 me.Source = ms;
                 me.MediaPlayer.Play();
             }
         }
-        List<MediaSource> msL;
         List<AppFile> filelist;
 
         private void applyAcrylicAccent(Panel panel)
@@ -107,7 +92,6 @@ namespace Vid
             coreTitleBar.ExtendViewIntoTitleBar = true;
             this.InitializeComponent();
             filelist = new List<AppFile>();
-            msL = new List<MediaSource>();
             applyAcrylicAccent(MainGrid);
             MediaPlayer mp = new MediaPlayer();
             mp.CurrentStateChanged += Mp_CurrentStateChangedAsync;
@@ -121,13 +105,13 @@ namespace Vid
                 case MediaPlaybackState.Playing:
                     await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
-                        button.Content = " playing";
+                        // TODO 재생 중일 때의 이벤트
                     });
                     break;
                 case MediaPlaybackState.Paused:
                     await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
                     {
-                        button.Content = " paused";
+                        // TODO 일시 정지 중일 때의 이벤트
                     });
                     break;
             }
@@ -149,17 +133,15 @@ namespace Vid
             openPicker.FileTypeFilter.Add(".mp4");
 
             var file = await openPicker.PickSingleFileAsync();
-
             if(file!= null)
             {
-
-                AppFile ap = new AppFile();
-                ap.name = file.Name;
-                ap.path = file.Path;
-                MediaSource msi = MediaSource.CreateFromStorageFile(file);
-                msL.Add(msi);
-                //player.Source = msi;
-                //player.MediaPlayer.Play();
+                if (filelist.All(ap => ap.name != file.Name))
+                {
+                    AppFile ap = new AppFile();
+                    ap.name = file.Name;
+                    ap.mediaSource = MediaSource.CreateFromStorageFile(file);
+                    filelist.Add(ap);
+                }
             }
         } 
 
@@ -171,13 +153,17 @@ namespace Vid
                 {
                     var item = await e.DataView.GetStorageItemsAsync();
                     if (item.Count > 0) { 
-                        foreach (var f in item.OfType<StorageFile>())
+                        foreach (var file in item.OfType<StorageFile>())
                         {
-                            if (f.Name.Contains("mp4")) { 
-                                AppFile ap = new AppFile();
-                                ap.name = f.Name;
-                                ap.path = f.Path;
-                                filelist.Add(ap);
+                            if (filelist.All(ap => ap.name != file.Name))
+                            { 
+                                if (file.Name.Contains("mp4"))
+                                { 
+                                    AppFile ap = new AppFile();
+                                    ap.name = file.Name;
+                                    ap.mediaSource = MediaSource.CreateFromStorageFile(file);
+                                    filelist.Add(ap);
+                                }
                             }
                         }
                         updateList();
@@ -189,17 +175,12 @@ namespace Vid
         private void updateList()
         {
             vidList.Children.Clear();
-            //foreach(var f in filelist)
-            //{
-            //    ListButton lb = new ListButton(f,player);
-            //    lb.Visibility = Visibility.Visible;
-            //    vidList.Children.Add(lb);
-            //}
-            foreach (var f in  msL)
+            foreach (var f in filelist)
             {
-                vidList.Children.Add(new ListButton(f,player));
+                ListButton lb = new ListButton(f, player);
+                lb.Visibility = Visibility.Visible;
+                vidList.Children.Add(lb);
             }
-
         }
         private void Grid_DragOver(object sender, DragEventArgs e)
         {
