@@ -253,7 +253,7 @@
             <Button x:Name="button" FontFamily="Segoe MDL2 Assets" Content="&#xE710;" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="64" Width="64" Click="Button_Click" Margin="0,0,32,32" Background="#FFFDB144" Canvas.ZIndex="1" Style="{StaticResource ButtonStyle1}" FontWeight="Bold" FontSize="24"  />
             <MediaPlayerElement x:Name="player" Margin="0,0,0,150" Width="auto" Height="auto" PosterSource="Assets/poster.PNG" FocusVisualPrimaryBrush="White" AreTransportControlsEnabled="True"/>
             <Grid Margin="0,0,0,0" Width="auto" Height="150" VerticalAlignment="Bottom" Background="#99000000">
-                <TextBox TextWrapping="Wrap" Text="A brown fox quick jumped over the lazy dog" Width="682" TextAlignment="Center" FontSize="36" VerticalAlignment="Center" FocusVisualPrimaryBrush="White" BorderThickness="0" Style="{StaticResource TextBoxStyle1}" />
+                <TextBox TextWrapping="Wrap" Text="A brown fox quick jumped over the lazy dog" Width="682" TextAlignment="Center" FontSize="36" VerticalAlignment="Center" FocusVisualPrimaryBrush="White" BorderThickness="0" Style="{StaticResource TextBoxStyle1}" Background="{x:Null}" />
             </Grid>
 
         </Grid>

@@ -35,18 +35,20 @@ namespace Vid
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private SystemMediaTransportControls MediaControls { get; }
+        //private SystemMediaTransportControls MediaControls { get; }
+        //데이터 자료형
         public class AppFile
         {
             public string name { get; set; }
             public MediaSource mediaSource { get; set; }
         }
+        //버튼 클래스
         public class ListButton : Button
         {
             MediaSource ms;
             MediaPlayerElement me;
             TextBlock label;
-            AppFile item;
+            //생성자
             public ListButton()
             {
                 this.Width = 150;
@@ -65,14 +67,19 @@ namespace Vid
                 this.ms = ms.mediaSource;
                 label.Text = ms.name;
             }
+            //클릭 이벤트
             public void OnClick(object sender, RoutedEventArgs e)
             {
                 me.Source = ms;
                 me.MediaPlayer.Play();
             }
         }
+        //필드
+        //데이터변수
         List<AppFile> filelist;
-
+        Compositor _compositor;
+        SpriteVisual _hostSprite;
+        //반투명화 처리
         private void applyAcrylicAccent(Panel panel)
         {
             _compositor = ElementCompositionPreview.GetElementVisual(this).Compositor;
@@ -82,22 +89,23 @@ namespace Vid
             ElementCompositionPreview.SetElementChildVisual(panel, _hostSprite);
             _hostSprite.Brush = _compositor.CreateHostBackdropBrush();
         }
-        Compositor _compositor;
-        SpriteVisual _hostSprite;
         public MainPage()
         {
+            //반투명화 처리
             ApplicationViewTitleBar formattableTitleBar = ApplicationView.GetForCurrentView().TitleBar;
             formattableTitleBar.ButtonBackgroundColor = Colors.Transparent;
             CoreApplicationViewTitleBar coreTitleBar = CoreApplication.GetCurrentView().TitleBar;
             coreTitleBar.ExtendViewIntoTitleBar = true;
+            //초기화
             this.InitializeComponent();
-            filelist = new List<AppFile>();
             applyAcrylicAccent(MainGrid);
+            //변수 초기화
+            filelist = new List<AppFile>();
             MediaPlayer mp = new MediaPlayer();
+            //미디어 플레이어에 이벤트핸들러 추가
             mp.CurrentStateChanged += Mp_CurrentStateChangedAsync;
             player.SetMediaPlayer(mp);
         }
-
         private async void Mp_CurrentStateChangedAsync(MediaPlayer sender, object args)
         {
             switch (sender.PlaybackSession.PlaybackState)
@@ -122,6 +130,7 @@ namespace Vid
                 _hostSprite.Size = e.NewSize.ToVector2();
         }
 
+        //버튼 클릭 및 비디오 로딩 메소드
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             await SetLocalMedia();
@@ -144,7 +153,7 @@ namespace Vid
                 }
             }
         } 
-
+        //드래그앤 드랍 이벤트
         private async void Grid_DropAsync(object sender, DragEventArgs e)
         {
             if (e.DragUIOverride != null)
@@ -171,7 +180,7 @@ namespace Vid
                 }
             }
         }
-
+        //앱바 파일 목록 갱신 함수
         private void updateList()
         {
             vidList.Children.Clear();
@@ -182,6 +191,7 @@ namespace Vid
                 vidList.Children.Add(lb);
             }
         }
+        
         private void Grid_DragOver(object sender, DragEventArgs e)
         {
             e.AcceptedOperation = DataPackageOperation.Copy;
