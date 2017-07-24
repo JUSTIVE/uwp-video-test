@@ -98,13 +98,14 @@ namespace Vid
             coreTitleBar.ExtendViewIntoTitleBar = true;
             //초기화
             this.InitializeComponent();
-            applyAcrylicAccent(MainGrid);
+            applyAcrylicAccent(mainGlass);
             //변수 초기화
             filelist = new List<AppFile>();
             MediaPlayer mp = new MediaPlayer();
             //미디어 플레이어에 이벤트핸들러 추가
             mp.CurrentStateChanged += Mp_CurrentStateChangedAsync;
             player.SetMediaPlayer(mp);
+            splitView.IsPaneOpen = true;
         }
         private async void Mp_CurrentStateChangedAsync(MediaPlayer sender, object args)
         {
@@ -164,10 +165,10 @@ namespace Vid
                     if (item.Count > 0) { 
                         foreach (var file in item.OfType<StorageFile>())
                         {
-                            if (filelist.All(ap => ap.name != file.Name))
-                            { 
-                                if (file.Name.Contains("mp4"))
-                                { 
+                            if (file.Name.Contains("mp4"))
+                            {
+                                if (filelist.All(ap => ap.name != file.Name))
+                                {
                                     AppFile ap = new AppFile();
                                     ap.name = file.Name;
                                     ap.mediaSource = MediaSource.CreateFromStorageFile(file);
@@ -183,13 +184,16 @@ namespace Vid
         //앱바 파일 목록 갱신 함수
         private void updateList()
         {
+            Button tempButton = vidList.Children.ElementAt(0) as Button;
             vidList.Children.Clear();
+            vidList.Children.Add(tempButton);
             foreach (var f in filelist)
             {
                 ListButton lb = new ListButton(f, player);
                 lb.Visibility = Visibility.Visible;
                 vidList.Children.Add(lb);
             }
+            
         }
         
         private void Grid_DragOver(object sender, DragEventArgs e)
@@ -201,6 +205,11 @@ namespace Vid
                 e.DragUIOverride.Caption = "Add file";
                 e.DragUIOverride.IsContentVisible = true;
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            splitView.IsPaneOpen = !splitView.IsPaneOpen;
         }
     }
 }
